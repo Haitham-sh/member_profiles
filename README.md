@@ -45,9 +45,7 @@ Optional External APIs for future enhancement.
 # Project Structure
 
 ## Django Apps Structure:
-
-\`\`\`
-
+```
 member\_profiles/  
 ├── users/                 \# User authentication & profiles  
 │   ├── models.py         \# User model  
@@ -66,8 +64,7 @@ member\_profiles/
 │   └── views.py           \# Membership endpoints  
 └── media/               \# File upload handling  
     └── uploads/         \# User and event files
-
-\`\`\`
+```
 
 ## Database Models:
 
@@ -85,9 +82,9 @@ member\_profiles/
 
 *(Visual representation showing tables with fields and relationships)*
 
-![ERD Diagram](static/images//erd%20visual%20representation.drawio%20(1).png)
-<center>(One User can be in Many Events via EventMember)</center>
-
+<div align="center">
+  <img src="/static/images/erd visual representation.drawio (1).png" alt="ERD Diagram">
+</div>
 
 ### **Field Specifications:**
 
@@ -191,4 +188,7 @@ member\_profiles/
 - **Event Creator/Organizer:** Can update/delete event, manage members  
 - **Event Members:** Can view event details and member list  
 - **Non-Members:** Can only view public event information
+---
+### Developed by:
+- **Haitham Elsherbeny** 
 
