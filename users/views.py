@@ -1,16 +1,13 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
 from django.contrib.auth import login
-
-
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def register_user(request):
     if request.method == 'POST':
         serializer = UserRegistrationSerializer(data=request.data)
@@ -23,7 +20,6 @@ def register_user(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def login_user(request):
     if request.method == 'POST':
         serializer = UserLoginSerializer(data=request.data)
@@ -37,3 +33,32 @@ def login_user(request):
                 'email': user.email
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def user_profile(request):
+    user = request.user
+    if request.method == 'GET':
+        serializer = UserProfileSerializer(user)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = UserProfileSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Profile updated successfully',
+                'user': serializer.data
+            })
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def check_auth(request):
+    return Response({
+        'message': 'User is authenticated',
+        'user': {
+            'id': request.user.id,
+            'username': request.user.username,
+            'email': request.user.email
+        }
+    })
