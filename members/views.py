@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import EventMember
 from events.models import Event
-from .serializers import EventMemberSerializer, JoinEventSerializer
+from users.models import User
+from .serializers import EventMemberSerializer, JoinEventSerializer, ChangeRoleSerializer
 
 # Create your views here.
 @api_view(['POST'])
@@ -44,16 +45,63 @@ def join_event(request, event_id):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def event_members(request, event_id):
     try:
         event = Event.objects.get(id=event_id)
-        members = EventMember.objects.filter(event=event)
-        serializer = EventMemberSerializer(members, many=True)
-        return Response(serializer.data)
     except Event.DoesNotExist:
         return Response(
             {'error': 'Event not found'}, 
             status=status.HTTP_404_NOT_FOUND
         )
+    is_member = EventMember.objects.filter(user=request.user, event=event).exists()
+    is_organizer = event.creator == request.user
+    if not (is_member or is_organizer):
+        return Response(
+            {'error': 'You are not a member of this event'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    members = EventMember.objects.filter(event=event)
+    serializer = EventMemberSerializer(members, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def change_member_role(request, event_id, member_id):
+    try:
+        event = Event.objects.get(id=event_id)
+        user = User.objects.get(id=member_id)
+        event_member = EventMember.objects.get(user=user, event=event)
+    except Event.DoesNotExist:
+        return Response(
+            {'error': 'Event not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except EventMember.DoesNotExist:
+        return Response(
+            {'error': 'Member not found in this event'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    if event.creator != request.user:
+        return Response(
+            {'error': 'Only event organizer can change roles'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    serializer = ChangeRoleSerializer(data=request.data)
+    if serializer.is_valid():
+        new_role = serializer.validated_data['new_role']
+        event_member.role = new_role
+        event_member.save()
+        return Response({
+            'message': f'Role changed to {new_role} successfully',
+            'member': {
+                'id': event_member.id,
+                'user_name': user.username,
+                'event_title': event.title,
+                'new_role': event_member.role
+            }
+        })
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

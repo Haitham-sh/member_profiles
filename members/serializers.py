@@ -19,3 +19,6 @@ class JoinEventSerializer(serializers.Serializer):
     event_password = serializers.CharField(write_only=True)
     bio = serializers.CharField(required=False, allow_blank=True)
     specialization = serializers.CharField(required=False, allow_blank=True)
+
+class ChangeRoleSerializer(serializers.Serializer):
+    new_role = serializers.ChoiceField(choices=EventMember.ROLE_CHOICES)
