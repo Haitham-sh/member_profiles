@@ -5,6 +5,9 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserPr
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login
 from rest_framework.permissions import IsAuthenticated
+from events.models import Event
+from members.models import EventMember
+from users.serializers import UserProfileSerializer
 
 # Create your views here.
 @api_view(['POST'])
@@ -61,4 +64,47 @@ def check_auth(request):
             'username': request.user.username,
             'email': request.user.email
         }
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_events_overview(request):
+    user = request.user
+    created_events = Event.objects.filter(creator=user).order_by('-created_at')[:5]
+    joined_events_memberships = EventMember.objects.filter(
+        user=user
+    ).select_related('event').order_by('-join_date')[:5]
+
+    created_events_data = []
+    for event in created_events:
+        created_events_data.append({
+            'id': event.id,
+            'title': event.title,
+            'event_type': event.event_type,
+            'event_date': event.event_date,
+            'member_count': event.eventmember_set.count(),
+            'role': 'organizer'
+        })
+    
+    joined_events_data = []
+    for membership in joined_events_memberships:
+        joined_events_data.append({
+            'id': membership.event.id,
+            'title': membership.event.title,
+            'event_type': membership.event.event_type,
+            'event_date': membership.event.event_date,
+            'member_count': membership.event.eventmember_set.count(),
+            'role': membership.role,
+            'join_date': membership.join_date
+        })
+    
+    return Response({
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'created_events_count': user.event_set.count(),
+            'joined_events_count': user.eventmember_set.count()
+        },
+        'recent_created_events': created_events_data,
+        'recent_joined_events': joined_events_data
     })
