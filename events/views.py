@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Event
 from .serializers import EventSerializer, EventCreateSerializer
+from django.db.models import Q
 
 # Create your views here.
 @api_view(['GET', 'POST'])
@@ -35,3 +36,38 @@ def event_detail(request, event_id):
             {'error': 'Event not found'}, 
             status=status.HTTP_404_NOT_FOUND
         )
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def event_search(request):
+    events = Event.objects.all()
+    
+    search_query = request.GET.get('q', '')
+    if search_query:
+        events = events.filter(
+            Q(title__icontains=search_query) | 
+            Q(description__icontains=search_query)
+        )
+    
+    event_type = request.GET.get('event_type', '')
+    if event_type:
+        events = events.filter(event_type=event_type)
+    
+    serializer = EventSerializer(events, many=True)
+    
+    return Response({
+        'count': events.count(),
+        'filters': {
+            'search_query': search_query,
+            'event_type': event_type,
+        },
+        'events': serializer.data
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def event_types(request):
+    event_types = [choice[0] for choice in Event.EVENT_TYPES]
+    return Response({
+        'event_types': event_types
+    })
