@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 from rest_framework.decorators import api_view, permission_classes
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from rest_framework.permissions import IsAuthenticated
 from events.models import Event
 from members.models import EventMember
@@ -152,3 +152,12 @@ def delete_profile_picture(request):
             return Response({
                 'error': 'No profile picture to delete'
             }, status=status.HTTP_400_BAD_REQUEST)
+        
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_user(request):
+    if request.method == 'POST':
+        logout(request)
+        return Response({
+            'message': 'Successfully logged out'
+        }, status=status.HTTP_200_OK)
