@@ -83,7 +83,7 @@ member\_profiles/
 *(Visual representation showing tables with fields and relationships)*
 
 <div align="center">
-  <img src="/static/images/erd visual representation.drawio (1).png" alt="ERD Diagram">
+  <img src="/media/images/erd visual representation.drawio (1).png" alt="ERD Diagram">
 </div>
 
 ### **Field Specifications:**

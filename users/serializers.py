@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User
-from django.contrib.auth import authenticate
+from rest_framework.parsers import MultiPartParser
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -57,3 +58,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_joined_events_count(self, obj):
         return obj.eventmember_set.count()
+    
+
+class ProfilePictureSerializer(serializers.Serializer):
+    profile_picture = serializers.ImageField()
+    parser_classes = [MultiPartParser]

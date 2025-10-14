@@ -7,7 +7,22 @@ from django.contrib.auth import login
 from rest_framework.permissions import IsAuthenticated
 from events.models import Event
 from members.models import EventMember
-from users.serializers import UserProfileSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from users.serializers import UserProfileSerializer, ProfilePictureSerializer
+from rest_framework.views import APIView
+
+# Create your views here.
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_events_overview(request):
+    user = request.user
+    created_events = Event.objects.filter(creator=user)
+    joined_events = EventMember.objects.filter(member=user)
+    created_events_count = created_events.count()
+    joined_events_count = joined_events.count()
+    return Response({
+    
+})
 
 # Create your views here.
 @api_view(['POST'])
@@ -108,3 +123,35 @@ def user_events_overview(request):
         'recent_created_events': created_events_data,
         'recent_joined_events': joined_events_data
     })
+
+class UploadProfilePictureView(APIView):
+    serializer_class = ProfilePictureSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ProfilePictureSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user.profile_picture = serializer.validated_data['profile_picture']
+            user.save()
+            return Response({
+                'message': 'Profile picture uploaded successfully'
+})
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_profile_picture(request):
+    if request.method == 'DELETE':
+        user = request.user
+        if user.profile_picture:
+            user.profile_picture.delete(save=False)
+            user.profile_picture = None
+            user.save()
+            
+            return Response({
+                'message': 'Profile picture deleted successfully'
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'error': 'No profile picture to delete'
+            }, status=status.HTTP_400_BAD_REQUEST)
