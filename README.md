@@ -63,7 +63,7 @@ member\_profiles/
 │   ├── urls.py               \# Urls  
 │   └── views.py           \# Membership endpoints  
 └── media/               \# File upload handling  
-    └── uploads/         \# User and event files
+    └── user_profiles/         \# User files
 ```
 
 ## Database Models:
