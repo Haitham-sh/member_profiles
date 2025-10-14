@@ -138,39 +138,35 @@ member\_profiles/
 ### **Authentication Endpoints:**
 
 | Method | Endpoint | Description | Request Body | Response |
-| :---- | :---- | :---- | :---- | :---- |
+|--------|----------|-------------|--------------|----------|
 | **POST** | `/api/auth/register/` | User registration | `{username, email, password}` | `{user_id, token}` |
 | **POST** | `/api/auth/login/` | User login | `{email, password}` | `{user_id, token}` |
 | **POST** | `/api/auth/logout/` | User logout | `{token}` | `{message: "Logged out"}` |
 | **GET** | `/api/auth/profile/` | Get user profile | `{token}` | `{user_data}` |
 | **PUT** | `/api/auth/profile/` | Update user profile | `{token, bio, profile_picture}` | `{updated_user}` |
+| **GET** | `/api/auth/check-auth/` | Check authentication status | `{token}` | `{is_authenticated, user_data}` |
+| **GET** | `/api/auth/events/` | Get user events overview | `{token}` | `{created_events, joined_events}` |
+| **PUT** | `/api/auth/profile/picture/` | Upload profile picture | `{token, image_file}` | `{profile_picture_url}` |
+| **DELETE** | `/api/auth/profile/picture/delete/` | Delete profile picture | `{token}` | `{message: "Deleted"}` |
 
 ### **Event Endpoints:**
 
 | Method | Endpoint | Description | Request Body | Response |
-| :---- | :---- | :---- | :---- | :---- |
-| **GET** | `/api/events/` | List all public events | `{token}` | `[event_list]` |
-| **POST** | `/api/events/create/` | Create a new event | `{token, title, description, event_type, event_password, event_date}` | `{event_id}` |
+|--------|----------|-------------|--------------|----------|
+| **GET** | `/api/events/` | List all events | `{token}` | `[event_list]` |
+| **POST** | `/api/events/` | Create a new event | `{token, title, description, event_type, event_password, event_date}` | `{event_details}` |
 | **GET** | `/api/events/{event_id}/` | Get event details | `{token}` | `{event_details}` |
-| **PUT** | `/api/events/{event_id}/` | Update event (creator only) | `{token, updated_fields}` | `{updated_event}` |
-| **DELETE** | `/api/events/{event_id}/` | Delete event (creator only) | `{token}` | `{message: "Deleted"}` |
 | **GET** | `/api/events/search/` | Search events | `{token, query, event_type}` | `[filtered_events]` |
+| **GET** | `/api/events/types/` | Get available event types | `{token}` | `[event_types_list]` |
 
 ### **Membership Endpoints:**
 
 | Method | Endpoint | Description | Request Body | Response |
-| :---- | :---- | :---- | :---- | :---- |
-| **POST** | `/api/events/{event_id}/join/` | Join an event | `{token, event_password, display_name}` | `{membership_id}` |
+|--------|----------|-------------|--------------|----------|
+| **POST** | `/api/events/{event_id}/join/` | Join an event | `{token, event_password}` | `{membership_id}` |
 | **GET** | `/api/events/{event_id}/members/` | List event members | `{token}` | `[member_list]` |
-| **PUT** | `/api/members/{member_id}/role/` | Change member role (organizer only) | `{token, new_role}` | `{updated_member}` |
-| **DELETE** | `/api/members/{member_id}/` | Remove member (organizer only) | `{token}` | `{message: "Removed"}` |
-| **GET** | `/api/user/events/` | Get the user's events | `{token}` | `[user_events]` |
+| **PUT** | `/api/events/{event_id}/members/{member_id}/role/` | Change member role (organizer only) | `{token, new_role}` | `{updated_member}` |
 
-### **File Upload Endpoints:**
-
-| Method | Endpoint | Description | Request Body | Response |
-| :---- | :---- | :---- | :---- | :---- |
-| **POST** | `/api/upload/profile-picture/` | Upload profile picture | `{token, image_file}` | `{image_url}` |
 
 ### **Authentication & Authorization Requirements:**
 
