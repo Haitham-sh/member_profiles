@@ -7,7 +7,6 @@ from django.contrib.auth import login
 from rest_framework.permissions import IsAuthenticated
 from events.models import Event
 from members.models import EventMember
-from rest_framework.parsers import MultiPartParser, FormParser
 from users.serializers import UserProfileSerializer, ProfilePictureSerializer
 from rest_framework.views import APIView
 
@@ -21,10 +20,8 @@ def user_events_overview(request):
     created_events_count = created_events.count()
     joined_events_count = joined_events.count()
     return Response({
-    
 })
 
-# Create your views here.
 @api_view(['POST'])
 def register_user(request):
     if request.method == 'POST':
