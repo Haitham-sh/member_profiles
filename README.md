@@ -163,9 +163,9 @@ member\_profiles/
 
 | Method | Endpoint | Description | Request Body | Response |
 |--------|----------|-------------|--------------|----------|
-| **POST** | `/api/events/{event_id}/join/` | Join an event | `{token, event_password}` | `{membership_id}` |
-| **GET** | `/api/events/{event_id}/members/` | List event members | `{token}` | `[member_list]` |
-| **PUT** | `/api/events/{event_id}/members/{member_id}/role/` | Change member role (organizer only) | `{token, new_role}` | `{updated_member}` |
+| **POST** | `/api/members/{event_id}/join/` | Join an event | `{token, event_password}` | `{membership_id}` |
+| **GET** | `/api/members/{event_id}/members/` | List event members | `{token}` | `[member_list]` |
+| **PUT** | `/api/members/events/{event_id}/members/{member_id}/role/` | Change member role (organizer only) | `{token, new_role}` | `{updated_member}` |
 
 
 ### **Authentication & Authorization Requirements:**
