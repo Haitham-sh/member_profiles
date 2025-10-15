@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import login, logout
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from events.models import Event
 from members.models import EventMember
 from users.serializers import UserProfileSerializer, ProfilePictureSerializer
@@ -23,6 +23,7 @@ def user_events_overview(request):
 })
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register_user(request):
     if request.method == 'POST':
         serializer = UserRegistrationSerializer(data=request.data)
@@ -35,6 +36,7 @@ def register_user(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def login_user(request):
     if request.method == 'POST':
         serializer = UserLoginSerializer(data=request.data)
